@@ -24,7 +24,7 @@ spec:
       containers:
       - name: currency-exchange
         image: jarrettd5309/currency-exchange-devops
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         ports:
         - name: liveness-port
           containerPort: 8000
