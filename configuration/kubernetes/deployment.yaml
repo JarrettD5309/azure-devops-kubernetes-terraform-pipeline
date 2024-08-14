@@ -62,9 +62,9 @@ metadata:
 spec:
   ports:
   - # nodePort: 30702 #CHANGE
-    port: 8000 #CHANGE
+    port: 8001 #CHANGE
     protocol: TCP
-    targetPort: 8000 #CHANGE
+    targetPort: 8001 #CHANGE
   selector:
     app: currency-exchange
   sessionAffinity: None #CHANGE
