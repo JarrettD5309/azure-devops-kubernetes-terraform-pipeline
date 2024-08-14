@@ -49,10 +49,10 @@ stages:
         artifactName: 'manifests'
         itemPattern: '**/*.yaml'
         targetPath: '$(System.ArtifactsDirectory)'
-    - task: KubernetesManifest@0
+    - task: KubernetesManifest@1
       inputs:
         action: 'deploy'
-        #connectionType: 'kubernetesServiceConnection'
+        connectionType: 'kubernetesServiceConnection'
         kubernetesServiceConnection: 'azure-kubernetes-connection'
         namespace: 'default'
         manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
