@@ -6,7 +6,7 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  tag: 'local.3' #'$(Build.BuildId)'
 
 stages:
 
