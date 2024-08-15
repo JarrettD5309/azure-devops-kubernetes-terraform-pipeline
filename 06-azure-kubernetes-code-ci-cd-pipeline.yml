@@ -53,7 +53,7 @@ stages:
       inputs:
         action: 'deploy'
         connectionType: 'kubernetesServiceConnection'
-        kubernetesServiceConnection: 'azure-kubernetes-connection'
+        kubernetesServiceConnection: 'azure-kubernetes-connection-2'
         namespace: 'default'
         manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
         containers: 'jarrettd5309/currency-exchange-devops:$(tag)'
