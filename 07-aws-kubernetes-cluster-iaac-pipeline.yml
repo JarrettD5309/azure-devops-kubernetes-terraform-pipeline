@@ -12,7 +12,7 @@ steps:
     provider: 'aws'
     command: 'init'
     workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/aws/kubernetes'
-    backendServiceAWS: 'aws-for-terraform'
+    backendServiceAWS: 'aws-for-terraform-2'
     backendAWSBucketName: 'terraform-backend-state-a2c4'
     backendAWSKey: 'kubernetes-dev.tfstate'
 - task: TerraformTaskV4@4
@@ -20,4 +20,4 @@ steps:
     provider: 'aws'
     command: 'apply'
     workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/aws/kubernetes'
-    environmentServiceNameAWS: 'aws-for-terraform'
+    environmentServiceNameAWS: 'aws-for-terraform-2'
