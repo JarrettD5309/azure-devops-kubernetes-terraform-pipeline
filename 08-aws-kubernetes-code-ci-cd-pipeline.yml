@@ -5,7 +5,7 @@ resources:
 - repo: self
 
 variables:
-  tag: '60' #'$(Build.BuildId)'
+  tag: '$(Build.BuildId)'
 
 stages:
 - stage: Build
@@ -28,22 +28,22 @@ stages:
     #   displayName: 'Install emulator'
     #   inputs:
     #     script: 'sudo apt-get install -y qemu qemu-user-static'
-    # - task: Docker@2
-    #   displayName: Build image
-    #   inputs:
-    #     containerRegistry: 'docker-hub'
-    #     repository: 'jarrettd5309/currency-exchange-devops'
-    #     command: 'build'
-    #     Dockerfile: '**/Dockerfile'
-    #     tags: '$(tag)'
-    #     arguments: '--platform linux/arm64'
-    # - task: Docker@2
-    #   displayName: Push image
-    #   inputs:
-    #     containerRegistry: 'docker-hub'
-    #     repository: 'jarrettd5309/currency-exchange-devops'
-    #     command: 'push'
-    #     tags: '$(tag)'
+    - task: Docker@2
+      displayName: Build image
+      inputs:
+        containerRegistry: 'docker-hub'
+        repository: 'jarrettd5309/currency-exchange-devops'
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
+        tags: '$(tag)'
+        #arguments: '--platform linux/arm64'
+    - task: Docker@2
+      displayName: Push image
+      inputs:
+        containerRegistry: 'docker-hub'
+        repository: 'jarrettd5309/currency-exchange-devops'
+        command: 'push'
+        tags: '$(tag)'
 
     - task: CopyFiles@2
       inputs:
