@@ -1,10 +1,11 @@
-# aws --version
-# aws eks --region us-east-1 update-kubeconfig --name in28minutes-cluster-2
+ # aws --version
+# aws eks --region us-east-1 update-kubeconfig --name in28minutes-cluster
 # Uses default VPC and Subnet. Create Your Own VPC and Private Subnets for Prod Usage.
 # terraform-backend-state-in28minutes-123
 # AKIA4AHVNOD7OOO6T4KI
-
-
+ 
+ 
+ 
 terraform {
   backend "s3" {
     bucket = "mybucket" # Will be overridden from build
@@ -12,75 +13,84 @@ terraform {
     region = "us-east-1"
   }
 }
-
+ 
 resource "aws_default_vpc" "default" {
-
+ 
 }
-
-### Uncomment this section after cluster creation line numbers 25 to 31 ###
-# data "aws_eks_cluster" "example" {
-#   name = "in28minutes-cluster-2"
-# }
-
-# data "aws_eks_cluster_auth" "example" {
-#   name = "in28minutes-cluster-2"
-# }
-### Uncomment this section after cluster creation ###
-
+ 
+ 
+ 
+ 
 provider "kubernetes" {
-### Uncomment this section after cluster creation line numbers 36 to 38###
-  # host                   = data.aws_eks_cluster.example.endpoint
-  # cluster_ca_certificate = base64decode(data.aws_eks_cluster.example.certificate_authority[0].data)
-  # token                  = data.aws_eks_cluster_auth.example.token
-### Uncomment this section after cluster creation ###
+  //>>Uncomment this section once EKS is created - Start
+  # host                   = data.aws_eks_cluster.cluster.endpoint #module.in28minutes-cluster.cluster_endpoint
+  # cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  # token                  = data.aws_eks_cluster_auth.cluster.token
+  //>>Uncomment this section once EKS is created - End
 }
-
-
+ 
 module "in28minutes-cluster" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "19.15.3"
-
-  cluster_name    = "in28minutes-cluster-2"
-  cluster_version = "1.29"
-
-  subnet_ids         = ["subnet-09e6495f9bbb55192", "subnet-0bd6f4313857524f5"] #CHANGE # Donot choose subnet from us-east-1e
-  #subnets = data.aws_subnet_ids.subnets.ids
+  source          = "terraform-aws-modules/eks/aws"
+  cluster_name    = "in28minutes-cluster"
+  cluster_version = "1.27"
+  subnet_ids         = ["subnet-09e6495f9bbb55192", "subnet-0bd6f4313857524f5"]  #CHANGE # Donot choose subnet from us-east-1e
   vpc_id          = aws_default_vpc.default.id
-  #vpc_id         = "vpc-1234556abcdef"
-
+ 
   //Newly added entry to allow connection to the api server
   //Without this change error in step 163 in course will not go away
   cluster_endpoint_public_access  = true
-
+ 
+# EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
-    ami_type = "AL2_x86_64"
-
+    instance_types = ["t2.small", "t2.medium"]
   }
-
+ 
   eks_managed_node_groups = {
-    one = {
-      name = "node-group-1"
-
-      instance_types = ["t3.small"]
-
+    blue = {}
+    green = {
       min_size     = 1
-      max_size     = 3
-      desired_size = 2
-    }
-
-    two = {
-      name = "node-group-2"
-
-      instance_types = ["t3.small"]
-
-      min_size     = 1
-      max_size     = 2
+      max_size     = 10
       desired_size = 1
+ 
+      instance_types = ["t2.medium"]
     }
   }
-
 }
-### Uncomment this section after cluster creation line numbers 88 to 115###
+ 
+//>>Uncomment this section once EKS is created - Start
+# data "aws_eks_cluster" "cluster" {
+#   name = "in28minutes-cluster" #module.in28minutes-cluster.cluster_name
+# }
+ 
+# data "aws_eks_cluster_auth" "cluster" {
+#   name = "in28minutes-cluster" #module.in28minutes-cluster.cluster_name
+# }
+ 
+# resource "kubernetes_default_service_account" "default" {
+#   metadata {
+#     name = "default"
+#     namespace = "default"
+#   }
+ 
+#   automount_service_account_token = true
+# }
+ 
+# resource "kubernetes_secret" "default-secret" {
+#   metadata {
+#     annotations = {
+#       "kubernetes.io/service-account.name" = kubernetes_default_service_account.default.metadata[0].name
+#     }
+ 
+#     generate_name = "default-secret"
+#   }
+ 
+ 
+#   type = "kubernetes.io/service-account-token"
+# }
+ 
+# # We will use ServiceAccount to connect to K8S Cluster in CI/CD mode
+# # ServiceAccount needs permissions to create deployments 
+# # and services in default namespace
 # resource "kubernetes_cluster_role_binding" "example" {
 #   metadata {
 #     name = "fabric8-rbac"
@@ -92,26 +102,14 @@ module "in28minutes-cluster" {
 #   }
 #   subject {
 #     kind      = "ServiceAccount"
-#     name      = "default"
-#     namespace = "default"
+#     name      = kubernetes_default_service_account.default.metadata[0].name
+#     namespace = kubernetes_default_service_account.default.metadata[0].namespace
 #   }
 # }
-
-# resource "kubernetes_secret" "example" {
-#   metadata {
-#     annotations = {
-#       "kubernetes.io/service-account.name" = "default"
-#     }
-
-#     generate_name = "terraform-default-"
-#   }
-
-#   type                           = "kubernetes.io/service-account-token"
-#   wait_for_service_account_token = true
-# }
-### Uncomment this section after cluster creation ###
-
+ 
+//>>Uncomment this section once EKS is created - End
+ 
 # Needed to set the default region
 provider "aws" {
   region  = "us-east-1"
-}
+} 
